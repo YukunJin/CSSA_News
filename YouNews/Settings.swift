@@ -49,34 +49,40 @@ override func viewDidLoad() {
     
     
 // MARK: - TABLEVIEW DELEGATES
+    //Set the number of section
 func numberOfSections(in tableView: UITableView) -> Int {
     return 1
 }
+    //Set the number of cells to be displayed in a section
 func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 6 // This is the number of cells that will be displayed
+    return 6
 }
-    
+  //Initialize cells
 func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    // Downcast each cell as a SettingsCell, which has an upper label, a lower label, and an image.
     let cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell", for: indexPath) as! SettingsCell
     
     // Round cell image
     cell.sImage.layer.cornerRadius = cell.sImage.bounds.size.width/2
     
     
-    // Init cells
+    // Set the labels and images to be displayed in each cell
     switch indexPath.row {
         
     case 0:
         cell.upperLabel.text = "Your Profile"
         if PFUser.current() != nil {
+            // Display user's username and get user's avatar if the user has logged in
             cell.lowerLabel.text = PFUser.current()!.username
             let imageFile = PFUser.current()![USER_AVATAR] as? PFFile
             imageFile?.getDataInBackground(block: { (data, error) in
                 if error == nil { if let imageData = data {
+                    // Display user's avatar
                     cell.sImage.image = UIImage(data: imageData)
             }}})
             
         } else {
+            // Display logo and login instructions if the user hasn't logged in
             cell.sImage.image = UIImage(named: "logo")
             cell.lowerLabel.text = "Tap to Login or Sign Up"
         }
@@ -114,7 +120,7 @@ func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> U
     
 return cell
 }
-    
+// Set height for each cell
 func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     return 80
 }
@@ -127,9 +133,11 @@ func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     // Go to your Profile
     case 0:
             if PFUser.current() != nil {
+                // Get into Profile interface
                 let aVC = storyboard?.instantiateViewController(withIdentifier: "Profile") as! Profile
                 navigationController?.pushViewController(aVC, animated: true)
             } else {
+                // Get into Login interface
                 let aVC = storyboard?.instantiateViewController(withIdentifier: "Login") as! Login
                 present(aVC, animated: true, completion: nil)
             }
@@ -151,12 +159,13 @@ func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     case 5:
         let messageStr  = "Get #" + APP_NAME + " on the App Store " + YOUR_APP_STORE_LINK
         let img = UIImage(named: "logo")!
-        
+        // Combine messageStr and img as shareItems
         let shareItems = [messageStr, img] as [Any]
         
         let activityViewController = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+        // Exclude the following activitytypes
         activityViewController.excludedActivityTypes = [.print, .postToWeibo, .copyToPasteboard, .addToReadingList, .postToVimeo]
-        
+        // Share with others
         if UIDevice.current.userInterfaceIdiom == .pad {
             // iPad
             let popOver = UIPopoverController(contentViewController: activityViewController)
